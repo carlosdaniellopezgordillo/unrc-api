@@ -28,9 +28,6 @@ pandas==2.1.3
 python-docx==0.8.11
 pypdf==3.17.1
 
-# CORS
-python-cors==1.2.0
-
 # Environment
 python-dotenv==1.0.0
 
