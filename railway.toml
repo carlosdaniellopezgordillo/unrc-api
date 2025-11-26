@@ -1,0 +1,25 @@
+# Railway Configuration
+# Deployment config for FastAPI + React on Railway
+
+[build]
+builder = "nix"
+buildCommand = "pip install -r requirements.txt && cd frontend && npm install && npm run build"
+
+[start]
+cmd = "uvicorn unrc_api_main:app --host 0.0.0.0 --port $PORT"
+runCommand = "pip install -r requirements.txt && python unrc_api_main.py"
+
+[env]
+PYTHON_VERSION = "3.9"
+NODE_VERSION = "18"
+PORT = "8000"
+
+[[services]]
+name = "backend"
+buildCommand = "pip install -r requirements.txt"
+startCommand = "uvicorn unrc_api_main:app --host 0.0.0.0 --port $PORT"
+
+[[services]]
+name = "frontend"
+buildCommand = "cd frontend && npm install && npm run build"
+startCommand = "npm start --prefix frontend"

@@ -1,0 +1,279 @@
+@startuml UNRC_API_Architecture
+!include <archimate/Archimate>
+!include <C4/C4_Component>
+
+skinparam backgroundColor #FFFFFF
+skinparam handwritten false
+skinparam roundcorners 10
+skinparam defaultFontSize 11
+skinparam defaultFontName "Segoe UI"
+skinparam linetype ortho
+
+' ========== TEMAS PROFESIONALES ==========
+skinparam rectangle {
+    BackgroundColor #F8F9FA
+    BorderColor #2C3E50
+    BorderThickness 2
+    FontColor #2C3E50
+    FontStyle bold
+}
+
+skinparam package {
+    BackgroundColor #ECEFF1
+    BorderColor #37474F
+    BorderThickness 2
+    FontColor #1A237E
+    FontStyle bold
+}
+
+skinparam actor {
+    BackgroundColor #00BCD4
+    BorderColor #00838F
+    FontColor #FFFFFF
+    FontStyle bold
+}
+
+skinparam database {
+    BackgroundColor #42A5F5
+    BorderColor #1565C0
+    FontColor #FFFFFF
+    FontStyle bold
+}
+
+skinparam entity {
+    BackgroundColor #66BB6A
+    BorderColor #2E7D32
+    FontColor #FFFFFF
+    FontStyle bold
+}
+
+skinparam folder {
+    BackgroundColor #FFA726
+    BorderColor #E65100
+    FontColor #FFFFFF
+    FontStyle bold
+}
+
+' ========== CAPA 1: USUARIOS ==========
+package "👥 USUARIOS Y ACTORES" #E3F2FD {
+    actor "👨‍🎓 ESTUDIANTE" as EST
+    actor "🏢 EMPRESA" as EMP
+}
+
+' ========== CAPA 2: FRONTEND - REACT ==========
+package "💻 FRONTEND - React 18 (localhost:3000)" #B3E5FC {
+    rectangle "🔐 AUTENTICACIÓN" #80DEEA {
+        component "Login.js" as LOGIN
+        component "Register.js" as REGISTER
+    }
+    
+    rectangle "📊 DASHBOARDS" #80DEEA {
+        component "DashboardEstudiante.js" as DASH_EST
+        component "DashboardEmpresa.js" as DASH_EMP
+    }
+    
+    rectangle "👤 PERFILES" #80DEEA {
+        component "PerfilEstudiante.js" as PERFIL_EST
+        component "PerfilEmpresa.js" as PERFIL_EMP
+    }
+    
+    rectangle "⚙️ GESTIÓN" #80DEEA {
+        component "GestionOfertas.js" as GEST_OFERTAS
+        component "GestionEstudiantes.js" as GEST_EST
+        component "FormularioOferta.js" as FORM_OFERTA
+    }
+    
+    component "📤 Upload CV" as UPLOAD_CV #FFE0B2
+}
+
+' ========== CAPA 3: ROUTING Y STORAGE ==========
+package "🛣️ REACT ROUTER v6" #FFF9C4 {
+    rectangle "Rutas:\n/login\n/register\n/dashboard/*\n/perfil/*\n/empresa/*" as ROUTER #FFE082
+}
+
+package "💾 LOCAL STORAGE" #F3E5F5 {
+    database "JWT Token" as TOKEN
+    database "User Data" as USERDATA
+    database "IDs (estudiante/empresa)" as IDS
+}
+
+' ========== CAPA 4: HTTP COMMUNICATION ==========
+package "🌐 HTTP COMMUNICATION LAYER" #FFECB3 {
+    rectangle "axios/fetch\nHTTP Methods: GET/POST/PUT/DELETE\nCORS: localhost:3000" as AXIOS #FFD54F
+}
+
+' ========== CAPA 5: BACKEND - FASTAPI ==========
+package "🚀 BACKEND - FastAPI (localhost:8000)" #C8E6C9 {
+    
+    package "🔒 MIDDLEWARE & SEGURIDAD" #A5D6A7 {
+        rectangle "CORS Middleware" #81C784
+        rectangle "JWT Authentication" #81C784
+        rectangle "Logging System" #81C784
+    }
+    
+    package "📍 ROUTERS - API Endpoints" #A5D6A7 {
+        rectangle "🔐 auth.py\n• POST /auth/register\n• POST /auth/login\n• POST /auth/verify-token" as AUTH #66BB6A
+        
+        rectangle "👨‍🎓 estudiantes.py\n• GET /estudiantes\n• GET /estudiantes/{id}\n• PUT /estudiantes/{id}\n• POST /upload-cv" as ESTUDIANTES #66BB6A
+        
+        rectangle "🏢 empresas.py\n• GET /empresas\n• GET /empresas/{id}\n• PUT /empresas/{id}" as EMPRESAS #66BB6A
+        
+        rectangle "💼 oportunidades.py\n• GET /oportunidades\n• POST /oportunidades\n• PUT /oportunidades/{id}\n• ⭐ GET /recomendadas/{id}" as OPORTUNIDADES #66BB6A
+        
+        rectangle "CRUD Endpoints\n• habilidades.py\n• experiencias.py\n• proyectos.py" as CRUD #66BB6A
+    }
+    
+    package "⚙️ SERVICIOS - Business Logic" #A5D6A7 {
+        rectangle "📄 cv_parser.py\n————————————\n• extract_text()\n• Detect spacing\n• simple_parse_sections()\n• Parse CV to JSON\n\nOUTPUT:\n{carrera, habilidades[],\nproyectos[], experiencias[]}" as CVPARSER #66BB6A
+        
+        rectangle "🎯 matching.py\n————————————\n• TF-IDF Similarity\n• Scoring Engine\n\nCriterios (100%):\n✓ Semestre: 20%\n✓ GPA: 15%\n✓ Habilidades: 40%\n✓ Experiencia: 15%\n✓ Proyectos: 10%\n✓ Disponibilidad: 5%\n\nOUTPUT: Score 0-100" as MATCHING #66BB6A
+    }
+    
+    package "🛠️ UTILIDADES & CONFIG" #A5D6A7 {
+        rectangle "🔒 security/core.py\n• hash_password()\n• verify_password()\n• JWT operations" as SECURITY #66BB6A
+        
+        rectangle "⚙️ core/config.py\n• DATABASE_URL\n• SECRET_KEY\n• JWT Config" as CONFIG #66BB6A
+        
+        rectangle "🏗️ schemas/models.py\n• SQLAlchemy ORM\n• 7 Data Models\n• Relationships" as MODELS #66BB6A
+    }
+}
+
+' ========== CAPA 6: INTELIGENCIA ARTIFICIAL ==========
+package "🧠 NLP ENGINE - spaCy" #E1BEE7 {
+    rectangle "spaCy (es_core_news_sm)\n————————————\n✓ Tokenizer\n✓ POS Tagger\n✓ NER (Entities)\n✓ Dependency Parser\n✓ Lemmatizer\n✓ Noun Chunks\n\nUSO: CV Parsing & Analysis" as SPACY #CE93D8
+}
+
+package "🤖 ML ENGINE - scikit-learn" #E1BEE7 {
+    rectangle "TF-IDF Vectorizer\n————————————\n✓ Text Vectorization\n✓ Cosine Similarity\n✓ Semantic Matching\n\nUSO: Job Matching Algorithm" as TFIDF #CE93D8
+}
+
+' ========== CAPA 7: BASE DE DATOS ==========
+package "🗄️ BASE DE DATOS - SQLite" #BBDEFB {
+    database "database.db" as DB #42A5F5
+    
+    package "📋 RELATIONAL SCHEMA" #90CAF9 {
+        entity "👤 user (Principal)\nid (PK) | email (UK)\nhashed_password | full_name\nrole | created_at" as USER_TABLE
+        
+        entity "👨‍🎓 estudiante (1-1 con user)\nid (PK) | user_id (FK)\nsemestre | gpa | cv_path\ncarrera | disponibilidad" as EST_TABLE
+        
+        entity "🏢 empresa (1-1 con user)\nid (PK) | user_id (FK)\nnombre | descripcion\nindustria" as EMP_TABLE
+        
+        entity "💼 oportunidad (1-N con empresa)\nid (PK) | empresa_id (FK)\ntitulo | descripcion\nsemestre_minimo | gpa_minimo\nanos_experiencia | habilidades[]" as OPP_TABLE
+        
+        entity "💪 habilidad (1-N con estudiante)\nid (PK) | estudiante_id (FK)\nnombre | categoria" as HAB_TABLE
+        
+        entity "📊 experiencia (1-N con estudiante)\nid (PK) | estudiante_id (FK)\nempresa | cargo | descripcion" as EXP_TABLE
+        
+        entity "🎯 proyecto (1-N con estudiante)\nid (PK) | estudiante_id (FK)\nnombre | descripcion" as PROJ_TABLE
+    }
+}
+
+' ========== CAPA 8: ALMACENAMIENTO DE ARCHIVOS ==========
+package "📁 FILE STORAGE" #FFE0B2 {
+    folder "uploaded_cvs/\n{estudianteId}.pdf" as CVSTORAGE #FFCC80
+}
+
+' ========== FLUJO DE CONEXIONES ==========
+
+' Capa 1 -> Capa 2: Usuarios acceden al Frontend
+EST --> LOGIN : accede
+EMP --> LOGIN : accede
+
+' Capa 2 -> Capa 3: Frontend usa Router
+LOGIN --> ROUTER
+REGISTER --> ROUTER
+DASH_EST --> ROUTER
+DASH_EMP --> ROUTER
+PERFIL_EST --> ROUTER
+PERFIL_EMP --> ROUTER
+GEST_OFERTAS --> ROUTER
+GEST_EST --> ROUTER
+FORM_OFERTA --> ROUTER
+
+' Capa 2 -> Capa 3: Frontend guarda/obtiene datos locales
+LOGIN --> TOKEN : guarda JWT
+LOGIN --> USERDATA : guarda userData
+DASH_EST --> IDS : obtiene estudianteId
+DASH_EMP --> IDS : obtiene empresaId
+UPLOAD_CV --> IDS : obtiene estudianteId
+
+' Capa 2 -> Capa 4: Todos hacen HTTP requests
+LOGIN --> AXIOS
+REGISTER --> AXIOS
+DASH_EST --> AXIOS
+DASH_EMP --> AXIOS
+PERFIL_EST --> AXIOS
+PERFIL_EMP --> AXIOS
+UPLOAD_CV --> AXIOS
+GEST_OFERTAS --> AXIOS
+GEST_EST --> AXIOS
+FORM_OFERTA --> AXIOS
+
+' Capa 4 -> Capa 5: HTTP llega a Backend
+AXIOS --> AUTH : POST /auth/*
+AXIOS --> ESTUDIANTES : GET /estudiantes/*\nPOST /upload-cv
+AXIOS --> EMPRESAS : GET /empresas/*
+AXIOS --> OPORTUNIDADES : GET /oportunidades/recomendadas\nPOST /oportunidades
+AXIOS --> CRUD : GET/POST/DELETE
+
+' Capa 5 (Backend internos)
+AUTH --> SECURITY : validate password
+ESTUDIANTES --> CVPARSER : parse_cv()
+OPORTUNIDADES --> MATCHING : calculate score
+CVPARSER --> MODELS : save data
+ESTUDIANTES --> MODELS : save/update
+EMPRESAS --> MODELS : save/update
+OPORTUNIDADES --> MODELS : save/update
+
+' Capa 5 -> Capa 6: Servicios usan AI
+CVPARSER --> SPACY : NER + Tokenization
+MATCHING --> TFIDF : similarity vectorization
+
+' Capa 5 -> Capa 7: ORM queries
+MODELS --> DB : SQLAlchemy ORM
+
+' Capa 8: File storage
+CVPARSER --> CVSTORAGE : read/write CV files
+ESTUDIANTES --> CVSTORAGE : store CV
+
+' Database internal relations
+DB --> USER_TABLE
+DB --> EST_TABLE
+DB --> EMP_TABLE
+DB --> OPP_TABLE
+DB --> HAB_TABLE
+DB --> EXP_TABLE
+DB --> PROJ_TABLE
+
+' ========== LEYENDA PROFESIONAL ==========
+legend right
+    |Color | Capa |
+    |<#E3F2FD> Usuarios |
+    |<#B3E5FC> Frontend (React) |
+    |<#FFF9C4> Router & Storage |
+    |<#FFECB3> HTTP Layer |
+    |<#C8E6C9> Backend (FastAPI) |
+    |<#E1BEE7> AI Engines |
+    |<#BBDEFB> Database (SQLite) |
+    |<#FFE0B2> File Storage |
+end legend
+
+note right of AXIOS
+  **CORS Configuration**
+  - Allow: localhost:3000
+  - Methods: GET, POST, PUT, DELETE
+  - Headers: Authorization, Content-Type
+end note
+
+note right of MATCHING
+  **⭐ Matching Algorithm**
+  Scoring 0-100 basado en:
+  - Semestre (20%)
+  - GPA (15%)
+  - Habilidades TF-IDF (40%)
+  - Experiencia (15%)
+  - Proyectos (10%)
+  - Disponibilidad (5%)
+end note
+
+@enduml
