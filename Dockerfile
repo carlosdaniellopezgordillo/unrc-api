@@ -26,8 +26,6 @@ RUN npm ci
 
 COPY frontend/src ./src
 COPY frontend/public ./public
-COPY frontend/tsconfig.json .
-COPY frontend/.env .
 
 # Build frontend
 RUN npm run build

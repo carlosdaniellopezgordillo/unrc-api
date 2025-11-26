@@ -5,8 +5,18 @@ from fastapi.responses import HTMLResponse, FileResponse
 import logging
 import sys
 import os
+import subprocess
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+
+# Descargar modelo spaCy en startup (solo si no existe)
+try:
+    import spacy
+    spacy.load("es_core_news_sm")
+except OSError:
+    logger_temp = logging.getLogger(__name__)
+    logger_temp.info("Descargando modelo spaCy es_core_news_sm...")
+    subprocess.check_call([sys.executable, "-m", "spacy", "download", "es_core_news_sm"])
 
 # Se importa el router de autenticación. A medida que crees más routers, los importarás aquí.
 from routers import auth, habilidades, experiencias, proyectos, empresas, oportunidades, estudiantes
