@@ -22,6 +22,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
+# Make start script executable
+RUN chmod +x /app/start.sh
+
 # Expose ports
 EXPOSE 8000
 
@@ -29,5 +32,5 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:8000/docs || exit 1
 
-# Start command - Railway inyecta $PORT como variable de entorno
-CMD uvicorn unrc_api_main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Start command using script
+CMD ["/app/start.sh"]
