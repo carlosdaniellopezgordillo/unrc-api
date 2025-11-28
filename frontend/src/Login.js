@@ -1,16 +1,24 @@
 import React, { useState } from 'react';
 import { FaSignInAlt, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
+import RecaptchaSimulator from './components/RecaptchaSimulator';
 
 export default function Login({ onLogin }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRobotVerified, setIsRobotVerified] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!isRobotVerified) {
+      setMessage('Por favor, verifica que no eres un robot.');
+      return;
+    }
+    
     setLoading(true);
     setMessage('');
     try {
@@ -56,7 +64,8 @@ export default function Login({ onLogin }) {
           <label>Contraseña:</label>
           <input type="password" minLength={6} value={password} onChange={e => setPassword(e.target.value)} required />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        <RecaptchaSimulator onVerify={setIsRobotVerified} />
+        <button type="submit" className="btn btn-primary" disabled={loading || !isRobotVerified}>
           <FaSignInAlt style={{verticalAlign:'middle', marginRight: '0.5rem'}}/>
           {loading ? 'Entrando...' : 'Entrar'}
         </button>

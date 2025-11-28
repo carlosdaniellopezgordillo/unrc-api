@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import RecaptchaSimulator from './components/RecaptchaSimulator';
 import './App.css'; // Asegúrate de que los estilos generales estén importados
 
 export default function Register() {
@@ -10,10 +11,17 @@ export default function Register() {
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isRobotVerified, setIsRobotVerified] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!isRobotVerified) {
+      setMessage('Por favor, verifica que no eres un robot.');
+      return;
+    }
+    
     setLoading(true);
     setMessage('');
     try {
@@ -68,7 +76,8 @@ export default function Register() {
           <label>Contraseña:</label>
           <input type="password" minLength={6} value={password} onChange={e => setPassword(e.target.value)} required />
         </div>
-        <button type="submit" className="btn btn-primary" disabled={loading}>
+        <RecaptchaSimulator onVerify={setIsRobotVerified} />
+        <button type="submit" className="btn btn-primary" disabled={loading || !isRobotVerified}>
           {loading ? 'Registrando...' : 'Crear Cuenta'}
         </button>
       </form>
